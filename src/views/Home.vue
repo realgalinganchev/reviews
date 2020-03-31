@@ -1,18 +1,61 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Venues v-bind:venues="venues" v-on:venue-details="showVenueDetails" />
+    <button @click="logout">Logout</button>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+// import db from "../firebase/firebaseInit";
+import firebase from "firebase";
+import Venues from "@/components/Venues.vue";
+// import axios from "axios";
 
 export default {
-  name: 'Home',
+  name: "home",
   components: {
-    HelloWorld
+    Venues
+  },
+  data() {
+    return {
+      venues: []
+    };
+  },
+  methods: {
+    logout: function() {
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          this.$router.replace("login");
+        });
+    },
+    showVenueDetails(id) {
+      this.$router.push({ name: "venue-details", params: { venue_id: id } });
+    }
   }
-}
+};
 </script>
+
+<style scoped>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.4;
+}
+.btn {
+  display: inline-block;
+  border: none;
+  background: #555;
+  color: #fff;
+  padding: 7px 20px;
+  cursor: pointer;
+}
+.btn:hover {
+  background: #666;
+}
+</style>

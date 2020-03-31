@@ -1,27 +1,59 @@
-import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import VenueList from '../components/VenueList.vue'
+import VenueDetails from '../components/VenueDetails.vue'
 
-Vue.use(VueRouter)
 
-const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
-]
+// import ShowBoard from '../components/ShowBoard.vue'
+// import Boardlist from '../components/Boardlist.vue'
+import AddBoard from '../components/AddBoard.vue'
+import EditBoard from '../components/EditBoard.vue'
+import HelloWorld from '../components/HelloWorld.vue'
 
-const router = new VueRouter({
-  routes
+export default new VueRouter({
+  routes: [
+        // {
+    //   path: '/',
+    //   name: 'Boardlist',
+    //   component: Boardlist
+    // },
+    // {
+    //   path: '/show-board/:id',
+    //   name: 'ShowBoard',
+    //   component: ShowBoard
+    // },
+    {
+      path: '/',
+      name: 'VenueList',
+      component: VenueList
+    },
+    {
+      path: '/helloWorld',
+      name: 'HelloWorld',
+      component: HelloWorld
+    },
+    
+    {
+      path: '/venue-details/:id',
+      name: 'VenueDetails',
+      component: VenueDetails
+    },
+    {
+      path: '/add-board',
+      name: 'AddBoard',
+      component: AddBoard
+    },
+    {
+      path: '/edit-board/:id',
+      name: 'EditBoard',
+      component: EditBoard
+    }
+  ]
 })
+// router.beforeEach((to, from, next) => {
+//   const currentUser = firebase.auth().currentUser;
+//   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
-export default router
+//   if (requiresAuth && !currentUser) next('login');
+//   else if (!requiresAuth && currentUser) next('home');
+//   else next();
+// });
