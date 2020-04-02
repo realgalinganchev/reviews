@@ -1,6 +1,10 @@
 <template>
   <b-row>
     <b-col cols="12">
+      <h2>
+         
+        <b-link href="#/add-venue">(Add Venue)</b-link>
+      </h2>
       <h2>Venue List</h2>
       <b-table striped hover :items="venues" :fields="fields">
         <template slot="cell(actions)" scope="row">
@@ -38,7 +42,7 @@ export default {
         {
           rating: { label: "Rating", class: "text-center  " }
         },
-                {
+        {
           location: { label: "Location", class: "text-center  " }
         }
       ],
@@ -55,8 +59,8 @@ export default {
           key: doc.id,
           name: doc.data().name,
           reviewsCount: doc.data().reviewsCount,
-          rating : doc.data().rating,
-          location : doc.data().location,
+          rating: doc.data().rating,
+          location: doc.data().location
         });
       });
     });

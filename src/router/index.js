@@ -1,51 +1,30 @@
 import VueRouter from 'vue-router'
 import VenueList from '../components/VenueList.vue'
 import VenueDetails from '../components/VenueDetails.vue'
-
-
-// import ShowBoard from '../components/ShowBoard.vue'
-// import Boardlist from '../components/Boardlist.vue'
-import AddBoard from '../components/AddBoard.vue'
-import EditBoard from '../components/EditBoard.vue'
-import HelloWorld from '../components/HelloWorld.vue'
+import AddVenue from '../components/AddVenue.vue'
+import EditVenue from '../components/EditVenue.vue'
 
 export default new VueRouter({
   routes: [
-        // {
-    //   path: '/',
-    //   name: 'Boardlist',
-    //   component: Boardlist
-    // },
-    // {
-    //   path: '/show-board/:id',
-    //   name: 'ShowBoard',
-    //   component: ShowBoard
-    // },
     {
       path: '/',
       name: 'VenueList',
       component: VenueList
     },
     {
-      path: '/helloWorld',
-      name: 'HelloWorld',
-      component: HelloWorld
+      path: '/edit-venue',
+      name: 'EditVenue',
+      component: EditVenue
     },
-    
     {
       path: '/venue-details/:id',
       name: 'VenueDetails',
       component: VenueDetails
     },
     {
-      path: '/add-board',
-      name: 'AddBoard',
-      component: AddBoard
-    },
-    {
-      path: '/edit-board/:id',
-      name: 'EditBoard',
-      component: EditBoard
+      path: '/add-venue',
+      name: 'AddVenue',
+      component: AddVenue
     }
   ]
 })
