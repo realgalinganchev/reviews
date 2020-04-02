@@ -39,7 +39,7 @@
         <div v-for="(r, i) in reviews" class="reviews" :key="i">
           <!-- <a>
             <img :src="g.imgSrc" :alt="g.imgAlt" />
-          </a> -->
+          </a>-->
           <div>
             <template v-if="r.text">
               <p>{{r.text}}</p>
@@ -47,14 +47,14 @@
                 class="show-desc"
                 :class="createBinding(i)"
                 @click="toggleDescription(g, $event)"
-              >Show Less</button> -->
+              >Show Less</button>-->
             </template>
             <template v-else>
               <!-- <button
                 class="show-desc"
                 @click="toggleDescription(g)"
                 :class="createBinding(g)"
-              >Show More</button> -->
+              >Show More</button>-->
             </template>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default {
       ref: firebase.firestore().collection("venues"),
       review: {},
       // eslint-disable-next-line no-undef
-      reviews: [],
+      reviews: []
     };
   },
   created() {
@@ -89,7 +89,6 @@ export default {
         this.key = doc.id;
         this.venue = doc.data();
         this.reviews = doc.data().reviews;
-        
       } else {
         alert("No such document!");
       }
@@ -117,7 +116,7 @@ export default {
     },
     onSubmit(evt) {
       evt.preventDefault();
-      
+
       this.reviews.push(this.review);
       const currentVenue = this.ref.doc(this.$route.params.id);
       currentVenue.update({

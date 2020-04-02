@@ -5,10 +5,10 @@
     <br />
     <input type="password" v-model="password" placeholder="Password" />
     <br />
-    <button @click="login">Connection</button>
+    <button @click="login">Login</button>
     <p>
-      You don't have an account ? You can
-      <router-link to="/sign-up">create one</router-link>
+      You don't have an account ? You can create one
+      <router-link to="/sign-up">here</router-link> !
     </p>
   </div>
 </template>
@@ -31,7 +31,7 @@ export default {
         .then(
           // eslint-disable-next-line no-unused-vars
           user => {
-            this.$router.replace("home");
+            this.$router.replace("/venue-list");
           },
           err => {
             alert("Oops. " + err.message);

@@ -7,12 +7,12 @@
       </h2>
       <b-jumbotron>
         <b-form @submit="onSubmit">
-          <b-form-group id="titleGroup"
+          <b-form-group id="nameGroup"
                     horizontal
                     :label-cols="4"
                     breakpoint="md"
-                    label="Enter Title">
-            <b-form-input id="title" v-model.trim="venue.name"></b-form-input>
+                    label="Enter Name">
+            <b-form-input id="name" v-model.trim="venue.name"></b-form-input>
           </b-form-group>
           <b-form-group id="descGroup"
                     horizontal
@@ -29,8 +29,8 @@
                     horizontal
                     :label-cols="4"
                     breakpoint="md"
-                    label="Enter Author">
-            <b-form-input id="author" v-model.trim="venue.location"></b-form-input>
+                    label="Enter Location">
+            <b-form-input id="location" v-model.trim="venue.location"></b-form-input>
           </b-form-group>
           <b-button type="submit" variant="primary">Update</b-button>
         </b-form>

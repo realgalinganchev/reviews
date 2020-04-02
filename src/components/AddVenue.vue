@@ -8,13 +8,13 @@
       <b-jumbotron>
         <b-form @submit="onSubmit">
           <b-form-group
-            id="titleGroup"
+            id="nameGroup"
             horizontal
             :label-cols="4"
             breakpoint="md"
             label="Enter name"
           >
-            <b-form-input id="title" v-model.trim="venue.name"></b-form-input>
+            <b-form-input id="name" v-model.trim="venue.name"></b-form-input>
           </b-form-group>
           <b-form-group
             id="descGroup"
@@ -38,7 +38,7 @@
             breakpoint="md"
             label="Enter location"
           >
-            <b-form-input id="author" v-model.trim="venue.location"></b-form-input>
+            <b-form-input id="location" v-model.trim="venue.location"></b-form-input>
           </b-form-group>
           <b-button type="submit" variant="primary">Save</b-button>
         </b-form>
@@ -48,43 +48,44 @@
 </template>
 
 <script>
-import firebase from '../firebase'
+import firebase from "../firebase";
 import router from "../router";
 
 export default {
-  name: 'AddVenue',
-  data () {
+  name: "AddVenue",
+  data() {
     return {
-
-      ref: firebase.firestore().collection('venues'),
+      ref: firebase.firestore().collection("venues"),
       venue: {},
-            review: {},
+      review: {},
 
-      reviews: [],
-    }
+      reviews: []
+    };
   },
   methods: {
-    onSubmit (evt) {
-                this.venue.rating = 0,
-        this.venue.reviewsCount = 0
-        this.venue.reviews = []
-      evt.preventDefault()
-      // eslint-disable-next-line no-unused-vars
-      this.ref.add(this.venue).then((docRef) => {
-        this.venue.title = ''
-        this.venue.description = ''
-        this.venue.location = ''
+    onSubmit(evt) {
+      (this.venue.rating = 0), (this.venue.reviewsCount = 0);
+      this.venue.reviews = [];
+      evt.preventDefault();
+      
+      this.ref
+        .add(this.venue)
+        // eslint-disable-next-line no-unused-vars
+        .then(doc => {
+          this.venue.name = "";
+          this.venue.description = "";
+          this.venue.location = "";
 
-        router.push({
-          name: 'VenueList'
+          router.push({
+            name: "VenueList"
+          });
         })
-      })
-      .catch((error) => {
-        alert("Error adding document: ", error);
-      });
+        .catch(error => {
+          alert("Error adding document: ", error);
+        });
     }
   }
-}
+};
 </script>
 
 <style>
