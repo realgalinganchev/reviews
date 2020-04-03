@@ -19,24 +19,32 @@ export default {
   name: "signUp",
   data() {
     return {
+      
       email: "",
-      password: ""
+      password: "",
+      ref: firebase.firestore().collection("users"),
     };
   },
+
   methods: {
     signUp: function() {
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
         .then(
-          // eslint-disable-next-line no-unused-vars
-          user => {
+          res => {
+            console.log(res.user.email);
+            this.ref.doc(res.user.uid).set({
+            email: res.user.email,
+            reviewsMade: 0,
+        });
             this.$router.replace("/venue-list");
           },
           err => {
             alert("Oops. " + err.message);
           }
         );
+      
     }
   }
 };

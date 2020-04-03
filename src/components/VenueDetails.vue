@@ -21,7 +21,7 @@
         <b-btn class="edit-btn" variant="success" @click.stop="editVenue(key)">Edit</b-btn>
         <b-btn variant="danger" @click.stop="deleteVenue(key)">Delete</b-btn>
       </b-jumbotron>
-      <b-jumbotron>
+      <b-jumbotron v-if="!isHidden">
         <b-form @submit="onSubmit">
           <b-form-group id="descGroup" horizontal breakpoint="md">
             <b-form-textarea
@@ -35,6 +35,9 @@
           <b-button type="submit" variant="primary">Submit review</b-button>
         </b-form>
       </b-jumbotron>
+      <b-jumbotron v-if="isHidden">
+        <router-link to="/venue-list">Back to venues</router-link>
+        </b-jumbotron>
       <b-jumbotron>
         <div v-for="(r, i) in reviews" class="reviews" :key="i">
           <!-- <a>
@@ -42,7 +45,9 @@
           </a>-->
           <div>
             <template v-if="r.text">
-              <p>{{r.text}}</p>
+              <b-jumbotron>
+              <p>{{r.text}} submited by {{r.author}} on {{r.submittedAt}}</p>
+             </b-jumbotron>
               <!-- <button
                 class="show-desc"
                 :class="createBinding(i)"
@@ -76,7 +81,8 @@ export default {
       ref: firebase.firestore().collection("venues"),
       review: {},
       // eslint-disable-next-line no-undef
-      reviews: []
+      reviews: [],
+      isHidden: false
     };
   },
   created() {
@@ -88,7 +94,7 @@ export default {
       if (doc.exists) {
         this.key = doc.id;
         this.venue = doc.data();
-        this.reviews = doc.data().reviews;
+        this.reviews = doc.data().reviews.reverse();
       } else {
         alert("No such document!");
       }
@@ -116,34 +122,27 @@ export default {
     },
     onSubmit(evt) {
       evt.preventDefault();
-
+      this.review.submittedAt = new Date().toJSON().slice(0,16).replace(/-/g,'/').replace(/T/g,' at ');
+      
+      //firebase.auth().currentUser.reviewsMade += 1;
+      this.review.author = firebase.auth().currentUser.email;
       this.reviews.push(this.review);
       const currentVenue = this.ref.doc(this.$route.params.id);
       currentVenue.update({
         reviews: firebase.firestore.FieldValue.arrayUnion(this.review)
       });
+      this.reviews = this.reviews.reverse();
+      this.isHidden = true;
     }
-  },
-  computed: {
-    // getReviewsArray() {
-    //   let reviews = this.venue.reviews;
-    //   const reviewsTexts = [];
-    //   console.log(reviews)
-    //   if (reviews !== undefined) {
-    //     let slicedReviews = reviews.slice(0, reviews.length - 1);
-    //     slicedReviews.forEach(e => {
-    //       reviewsTexts.push(e.text);
-    //     });
-    //   }
-    //   return reviewsTexts;
-    // }
   }
 };
 </script>
 
 <style>
 .jumbotron {
-  padding: 2rem;
+  padding: 2rem;  
+  border-style: groove;
+  border-color: black;
 }
 .edit-btn {
   margin-right: 20px;

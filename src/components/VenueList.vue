@@ -1,11 +1,11 @@
 <template>
   <b-row>
-    <b-col cols="12">
+    <b-col>
       <h2>
         <b-link href="#/add-venue">(Add Venue)</b-link>
       </h2>
       <h2>Venue List</h2>
-      <button @click="logout">Logout</button>
+
       <b-table striped hover :items="venues" :fields="fields">
         <template slot="cell(actions)" scope="row">
           <b-btn size="sm" @click.stop="viewReviews(row.item)">View Reviews</b-btn>
@@ -46,6 +46,9 @@ export default {
       ref: firebase.firestore().collection("venues")
     };
   },
+  beforeCreate() {
+    this.$emit("onAuth", firebase.auth().currentUser !== null);
+  },
   created() {
     this.ref.onSnapshot(querySnapshot => {
       this.venues = [];
@@ -63,14 +66,6 @@ export default {
   methods: {
     viewReviews(venue) {
       router.push({ name: "VenueDetails", params: { id: venue.key } });
-    },
-    logout: function() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          this.$router.replace("login");
-        });
     }
   }
 };
