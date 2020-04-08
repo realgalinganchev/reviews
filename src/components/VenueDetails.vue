@@ -1,75 +1,93 @@
 <template>
-  <b-row>
-    <b-col cols="12">
+  <row>
+    <div>
       <h2>
         Edit Venue
-        <b-link href="#/">(Venue List)</b-link>
+        <router-link to="/venue-list">Venue list</router-link>
       </h2>
-      <b-jumbotron>
+      <div>
         <template slot="header">{{venue.name}}</template>
         <template slot="lead">
           Description: {{venue.description}}
           <br />
           Location: {{venue.location}}
           <br />
-          Reviews made: {{venue.reviewsCount}}
+          <!-- Reviews made: {{venue.reviewsCount}} -->
           <br />
           Rating: {{venue.rating}}
           <br />
         </template>
         <hr class="my-4" />
-        <b-btn class="edit-btn" variant="success" @click.stop="editVenue(key)">Edit</b-btn>
-        <b-btn variant="danger" @click.stop="deleteVenue(key)">Delete</b-btn>
-      </b-jumbotron>
-      <b-jumbotron v-if="!isHidden">
-        <b-form @submit="onSubmit">
-          <b-form-group id="descGroup" horizontal breakpoint="md">
-            <b-form-textarea
+        <btn class="edit-btn" variant="success" @click.stop="editVenue(key)">Edit</btn>
+        <btn variant="danger" @click.stop="deleteVenue(key)">Delete</btn>
+      </div>
+      <div> v-if="!isHidden">
+        <form @submit="onSubmit">
+          <form-group id="descGroup" horizontal breakpoint="md">
+            <form-textarea
               id="review"
               v-model="review.text"
               placeholder="How was your experience here?"
               :rows="4"
               :max-rows="10"
-            >{{review.text}}</b-form-textarea>
-          </b-form-group>
-          <b-button type="submit" variant="primary">Submit review</b-button>
-        </b-form>
-      </b-jumbotron>
-      <b-jumbotron v-if="isHidden">
+            >{{review.text}}</form-textarea>
+          </form-group>
+          <button type="submit" variant="primary">Submit review</button>
+        </form>
+      </div>
+      <div> v-if="isHidden">
         <router-link to="/venue-list">Back to venues</router-link>
-        </b-jumbotron>
-      <b-jumbotron>
+      </div>
+      <div>
         <div v-for="(r, i) in reviews" class="reviews" :key="i">
-          <!-- <a>
-            <img :src="g.imgSrc" :alt="g.imgAlt" />
-          </a>-->
-          <div>
-            <template v-if="r.text">
-              <b-jumbotron>
-              <p>{{r.text}} submited by {{r.author}} on {{r.submittedAt}}</p>
-             </b-jumbotron>
-              <!-- <button
-                class="show-desc"
-                :class="createBinding(i)"
-                @click="toggleDescription(g, $event)"
-              >Show Less</button>-->
+          <div class="edit">
+            <template v-if="!r.showEditField">
+              <div>
+                <p>{{r.text}} submitted by {{r.author}} on {{r.submittedAt}}</p>
+                <div v-if="(authorEmail === r.author)">
+                  <form @submit="deleteReview">
+                    <button type="submit" variant="primary">Delete</button>
+                  </form>
+                  <button
+                    class="show-desc"
+                    
+                    @click="toggleDescription(r, $event)"
+                  >Edit</button>
+                </div>
+              </div>
             </template>
             <template v-else>
-              <!-- <button
-                class="show-desc"
-                @click="toggleDescription(g)"
-                :class="createBinding(g)"
-              >Show More</button>-->
+              <div>
+                <form @submit="editReview">
+                  <form-group id="descGroup" horizontal breakpoint="md">
+                    <form-textarea
+                      id="edit-review"
+                      v-model="review.editedText"
+                      placeholder="You have changed your mind?"
+                      :rows="4"
+                      :max-rows="10"
+                    >{{review.text}}</form-textarea>
+                  </form-group>
+                  <button
+                    class="show-desc"
+                    @click="toggleDescription(r)"
+                    
+                  >Save changes</button>
+                  <form @submit="deleteReview">
+                    <button type="submit" variant="primary">Delete</button>
+                  </form>
+                </form>
+              </div>
             </template>
           </div>
         </div>
-      </b-jumbotron>
-    </b-col>
-  </b-row>
+      </div>
+    </div>
+  </row>
 </template>
 
 <script>
-import firebase from "../firebase";
+const fb = require('../firebase.js')
 import router from "../router";
 
 export default {
@@ -77,16 +95,26 @@ export default {
   data() {
     return {
       key: "",
+      rKey: "",
       venue: {},
-      ref: firebase.firestore().collection("venues"),
+      ref: fb.firestore().collection("venues"),
+      usersRef: fb.firestore().collection("users"),
       review: {},
       // eslint-disable-next-line no-undef
       reviews: [],
-      isHidden: false
+      isHidden: false,
+      alreadyReviewed: [],
+      authorEmail: fb.auth().currentUser.email,
+      isDeleted: Boolean,
+      currEmail: fb.auth().currentUser.email
+      
     };
   },
+  beforeCreate() {
+    this.$emit("onAuth", fb.auth().currentUser !== null);
+  },
   created() {
-    const ref = firebase
+    const ref = fb
       .firestore()
       .collection("venues")
       .doc(this.$route.params.id);
@@ -120,19 +148,63 @@ export default {
           alert("Error removing document: ", error);
         });
     },
+    // editReview(id) {
+    //   router.push({
+    //     name: "EditVenue",
+    //     params: { id: id }
+    //   });
+    // },
     onSubmit(evt) {
       evt.preventDefault();
-      this.review.submittedAt = new Date().toJSON().slice(0,16).replace(/-/g,'/').replace(/T/g,' at ');
-      
-      //firebase.auth().currentUser.reviewsMade += 1;
-      this.review.author = firebase.auth().currentUser.email;
-      this.reviews.push(this.review);
+      const currentUser = this.usersRef.doc(fb.auth().currentUser.uid);
+      currentUser.get().then(doc => {
+        if (!doc.data().alreadyReviewed.includes(this.$route.params.id)) {
+          this.review.submittedAt = new Date()
+            .toJSON()
+            .slice(0, 10)
+            .replace(/-/g, "/");
+          this.review.author = fb.auth().currentUser.email;
+          this.review.venueId = this.$route.params.id;
+          this.review.showEditField = false;
+          this.review.editedText = "";
+          this.reviews.push(this.review);
+          const currentVenue = this.ref.doc(this.$route.params.id);
+          currentVenue.update({
+            reviews: fb.firestore.FieldValue.arrayUnion(this.review),
+            reviewsCount: fb.firestore.FieldValue.increment(1)
+          });
+          currentUser.update({
+            reviewsMade: fb.firestore.FieldValue.arrayUnion(this.review),
+            alreadyReviewed: fb.firestore.FieldValue.arrayUnion(
+              this.$route.params.id
+            )
+          });
+        } else {
+          alert("You have already submitted a review for this venue!");
+        }
+      });
+
+      //this.reviews = this.reviews.reverse();
+      this.isHidden = true;
+    },
+    deleteReview(evt) {
+      evt.preventDefault();
+
+      const toBeDeleted = this.reviews.filter(e => e.author === this.currEmail);
       const currentVenue = this.ref.doc(this.$route.params.id);
       currentVenue.update({
-        reviews: firebase.firestore.FieldValue.arrayUnion(this.review)
+        reviews: fb.firestore.FieldValue.arrayRemove(...toBeDeleted)
+        // reviewsCount: reviewsCount- 1,
       });
-      this.reviews = this.reviews.reverse();
-      this.isHidden = true;
+      this.reviews = this.reviews.filter(e => e.author !== this.currEmail);
+    },
+
+    toggleDescription(r) {
+
+      r.showEditField = !r.showEditField;
+    },
+    editReview(evt) {
+      evt.preventDefault();
     }
   }
 };
@@ -140,7 +212,7 @@ export default {
 
 <style>
 .jumbotron {
-  padding: 2rem;  
+  padding: 2rem;
   border-style: groove;
   border-color: black;
 }
@@ -149,13 +221,3 @@ export default {
   width: 70px;
 }
 </style>
-  addVenueToFavourites(item) {
-    const venueToBeAdded = this.db.collection('venues').doc(item.payload.doc.id);
-    venueToBeAdded.get().toPromise().then(documentSnapshot => {
-      const data = documentSnapshot.data();
-      const currentUserRef = this.db.collection('users').doc(this.customersUid);
-      currentUserRef.update({
-        favourites: firebase.firestore.FieldValue.arrayUnion(data)
-      });
-    });
-  }

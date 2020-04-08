@@ -1,69 +1,161 @@
 <template>
-  <div class="login">
-    <h3>Login</h3>
-    <input type="text" v-model="email" placeholder="Email" />
-    <br />
-    <input type="password" v-model="password" placeholder="Password" />
-    <br />
-    <button @click="login">Login</button>
-    <p>
-      You don't have an account ? You can create one
-      <router-link to="/sign-up">here</router-link> !
-    </p>
+  <div id="login">
+    <transition name="fade">
+      <div v-if="performingRequest" class="loading">
+        <p>Loading...</p>
+      </div>
+    </transition>
+    <section>
+      <div class="col1">
+        <h1>Reviews System</h1>
+        <p>
+          Welcome to the Night Life Sofia - Reviews System. The social media web app powered by Vue.js and Firebase.
+          Login to view what others think about the venues or visit us at
+          <a href="https://nightlifesofia.com/" target="_blank">Night Life Sofia</a>
+        </p>
+      </div>
+      <div class="col2" :class="{ 'signup-form': !showLoginForm }">
+        <form v-if="showLoginForm" @submit.prevent>
+          <h1>Welcome Back</h1>
+
+          <label for="email1">Email</label>
+          <input v-model.trim="loginForm.email" type="text" placeholder="you@email.com" id="email1" />
+
+          <label for="password1">Password</label>
+          <input
+            v-model.trim="loginForm.password"
+            type="password"
+            placeholder="******"
+            id="password1"
+          />
+
+          <button @click="login" class="button">Log In</button>
+
+          <div class="extras">
+            <a @click="toggleForm">Create an Account</a>
+          </div>
+        </form>
+        <form v-if="!showLoginForm " @submit.prevent>
+          <h1>Get Started</h1>
+
+          <label for="name">Name</label>
+          <input v-model.trim="signupForm.name" type="text" placeholder="Savvy Apps" id="name" />
+
+          <label for="email2">Email</label>
+          <input
+            v-model.trim="signupForm.email"
+            type="text"
+            placeholder="you@email.com"
+            id="email2"
+          />
+
+          <label for="password2">Password</label>
+          <input
+            v-model.trim="signupForm.password"
+            type="password"
+            placeholder="min 6 characters"
+            id="password2"
+          />
+
+          <button @click="signup" class="button">Sign Up</button>
+
+          <div class="extras">
+            <a @click="toggleForm">Back to Log In</a>
+          </div>
+        </form>
+        <transition name="fade">
+          <div v-if="errorMsg !== ''" class="error-msg">
+            <p>{{ errorMsg }}</p>
+          </div>
+        </transition>
+      </div>
+    </section>
   </div>
 </template>
 
 <script>
-import firebase from "firebase";
+// import { currentUser } from '../firebase';
+const fb = require("../firebase.js");
+
 export default {
-  name: "login",
   data() {
     return {
-      email: "",
-      password: ""
+      loginForm: {
+        email: "",
+        password: ""
+      },
+      signupForm: {
+        name: "",
+        email: "",
+        password: ""
+      },
+      passwordForm: {
+        email: ""
+      },
+      showLoginForm: true,
+      performingRequest: false,
+      errorMsg: ""
     };
   },
   methods: {
-    login: function() {
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(this.email, this.password)
-        .then(
-          // eslint-disable-next-line no-unused-vars
-          user => {
-            this.$router.replace("/venue-list");
-          },
-          err => {
-            alert("Oops. " + err.message);
-          }
-        );
-        
-    }
+    toggleForm() {
+      this.errorMsg = "";
+      this.showLoginForm = !this.showLoginForm;
+    },
+    login() {
+      this.performingRequest = true;
+
+      fb.auth
+        .signInWithEmailAndPassword(
+          this.loginForm.email,
+          this.loginForm.password
+        )
+        .then(user => {
+          this.$store.commit("setCurrentUser", user.user);
+          this.$store.dispatch("fetchUserProfile");
+          this.performingRequest = false;
+          this.$router.push("/venue-list");
+        })
+        .catch(err => {
+          console.log(err);
+          this.performingRequest = false;
+          this.errorMsg = err.message;
+        });
+    },
+    signup() {
+      this.performingRequest = true;
+ 
+      fb.auth
+        .createUserWithEmailAndPassword(
+          this.signupForm.email,
+          this.signupForm.password
+        )
+        .then(user => {
+          this.$store.commit("setCurrentUser", user);
+           
+          // create user obj
+          fb.usersCollection
+            .doc(user.user.uid)
+            .set({
+              name: this.signupForm.name,
+            })
+            .then(() => {
+              this.$store.dispatch("fetchUserProfile");
+              this.performingRequest = false;
+              this.$router.push("/venue-list");
+            })
+            .catch(err => {
+              console.log(err);
+              this.performingRequest = false;
+              this.errorMsg = err.message;
+            });
+        })
+        .catch(err => {
+          console.log(err);
+          this.performingRequest = false;
+          this.errorMsg = err.message;
+        });
+    },
   }
 };
 </script>
-
-<style scoped>
-/* "scoped" attribute limit the CSS to this component only */
-.login {
-  margin-top: 40px;
-}
-input {
-  margin: 10px 0;
-  width: 20%;
-  padding: 15px;
-}
-button {
-  margin-top: 20px;
-  width: 10%;
-  cursor: pointer;
-}
-p {
-  margin-top: 40px;
-  font-size: 13px;
-}
-p a {
-  text-decoration: underline;
-  cursor: pointer;
-}
-</style>

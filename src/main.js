@@ -1,33 +1,25 @@
+/* eslint-disable no-unused-vars */
 import Vue from 'vue'
 import App from './App.vue'
-import firebase from 'firebase';
-// import VueRouter from 'vue-router'
 import router from './router'
-import BootstrapVue from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-
+import { store } from './store.js'
+const fb = require('./firebase.js')
+import './assets/scss/app.scss'
 
 
 Vue.config.productionTip = false
 Vue.use(router)
-Vue.use(BootstrapVue)
-
-// new Vue({
-//   router,
-//   render: h => h(App)
-// }).$mount('#app')
 
 let app = '';
 
-// firebase.initializeApp(config);
 
-firebase.auth().onAuthStateChanged(() => {
-  if (!app) {
-    /* eslint-disable no-new */
-    app = new Vue({
-      router,
-      render: h => h(App)
-    }).$mount('#app');
-  }
-});
+fb.auth.onAuthStateChanged(user => {
+    if (!app) {
+        app = new Vue({
+            el: '#app',
+            router,
+            store,
+            render: h => h(App)
+        })
+    }
+})

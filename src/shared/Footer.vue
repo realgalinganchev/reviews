@@ -1,6 +1,6 @@
 
 <template>
-  <footer>Night Life Sofia - Reviews System {{getYear}}</footer>
+  <footer>Night Life Sofia - Reviews System {{getYear}}   ®</footer>
 </template>
 
 <script>
@@ -22,6 +22,6 @@ footer {
   width: 100%;
   background-color: #9e5e6f;
   color: white;
-  text-align: center;
+  text-align: right;
 }
 </style>

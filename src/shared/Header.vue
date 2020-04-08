@@ -1,71 +1,31 @@
 <template>
-  <nav>
-    <ul>
-      <li>
-        <router-link to="/venue-list">Home</router-link>
-      </li>
-      <li v-if="!isAuth">
-        <router-link to="/login">Login</router-link>
-      </li>
-      <li v-if="!isAuth">
-        <router-link to="/sign-up">Sign Up</router-link>
-      </li>
-      <li v-if="isAuth">
-        <a @click="logout" class="logout">Logout</a>
-      </li>
-    </ul>
-  </nav>
+    <header>
+        <section>
+            <div class="col1">
+                <router-link to="venue-list"><h3>Reviews System</h3></router-link>
+                <ul class="inline">
+                    <li><router-link to="venue-list">Venue List</router-link></li>
+                    <li><router-link to="profile">Profile</router-link></li>
+                    <li><a @click="logout">Logout</a></li>
+                </ul>
+            </div>
+        </section>
+    </header>
 </template>
 
 <script>
-import firebase from "../firebase";
+    const fb = require('../firebase.js')
 
-export default {
-  props: {
-    isAuth: Boolean
-  },
-  name: "Header",
-  methods: {
-    logout: function() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          this.$router.replace("login");
-        });
-      this.$emit("onAuth", false);
+    export default {
+        methods: {
+            logout() {
+                fb.auth.signOut().then(() => {
+                    this.$store.dispatch('clearData')
+                    this.$router.push('/login')
+                }).catch(err => {
+                    console.log(err)
+                })
+            }
+        }
     }
-  }
-};
 </script>
-
-<style scoped>
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color:  #9e5e6f;
-}
-
-li {
-  float: left;
-}
-
-li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-
-/* Change the link color to #111 (black) on hover */
-li a:hover {
-  background-color: #111;
-}
-
-.logout {
-  cursor: pointer;
-}
-</style>

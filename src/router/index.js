@@ -4,26 +4,28 @@ import Router from 'vue-router'
 
 // import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
-import SignUp from '../views/SignUp.vue'
+// import SignUp from '../views/SignUp.vue'
 
 import VenueList from '../components/VenueList.vue'
 import VenueDetails from '../components/VenueDetails.vue'
 import AddVenue from '../components/AddVenue.vue'
 import EditVenue from '../components/EditVenue.vue'
+import Profile from '../components/Profile.vue'
 
 Vue.use(Router)
 
 const router = new Router({
+  mode: 'history',
   routes: [
-
-    {
-      path: '*',
-      redirect: '/login'
-    },
-    {
-      path: '/',
-      redirect: '/login'
-    },
+		{
+			path: '*',
+			redirect: '/venue-list'
+		},
+		{
+			path: '/login',
+			name: 'Login',
+			component: Login
+		},
     {
       path: '/venue-list',
       name: 'VenueList',
@@ -31,16 +33,6 @@ const router = new Router({
       meta: {
         requiresAuth: true
       }
-    },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login
-    },
-    {
-      path: '/sign-up',
-      name: 'SignUp',
-      component: SignUp
     },
     {
       path: '/edit-venue',
@@ -65,16 +57,29 @@ const router = new Router({
       meta: {
         requiresAuth: true
       }
-    }
+    },
+    {
+			path: '/profile',
+			name: 'Profile',
+			component: Profile,
+            meta: {
+                requiresAuth: true
+            }
+		}
   ]
 })
+
 router.beforeEach((to, from, next) => {
-  const currentUser = firebase.auth().currentUser;
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresAuth = to.matched.some(x => x.meta.requiresAuth)
+  const currentUser = firebase.auth().currentUser
 
-  if (requiresAuth && !currentUser) next('login');
-  else if (!requiresAuth && currentUser) next('/venue-list');
-  else next();
-});
+  if (requiresAuth && !currentUser) {
+      next('/login')
+  } else if (requiresAuth && currentUser) {
+      next()
+  } else {
+      next()
+  }
+})
 
-export default router;
+export default router
