@@ -115,13 +115,16 @@ header {
     		flex: 0 0 40%;
     	}
     }
+    .col2 {
+        div {
+            h2 {
+                text-align: center;
+            }
+        }
+    }
     .profile {
         background: $white;
         padding: 2rem;
-
-        h5 {
-
-        }
 
         p {
             color: $medium;
@@ -306,6 +309,30 @@ header {
 }
 
 #profile {
+    padding: 2rem 0;
+
+    .col1 {
+        max-width: 600px;
+        margin: 5vh auto 0;
+        background: $white;
+        padding: 2rem;
+    }
+
+    form {
+        margin-top: 3rem;
+    }
+
+    .success {
+        color: $success;
+        margin: 0.5rem 0 -2rem;
+    }
+
+    .button {
+        margin-top: 2rem;
+    }
+}
+
+#add-venue {
     padding: 2rem 0;
 
     .col1 {

@@ -2,25 +2,10 @@
 <template>
   <div id="venue-list">
     <section>
-      <div class="col1">
-        <div class="profile">
-          <h5>Hello, {{ userProfile.name }}</h5>
-          <div class="create-venue">
-            <p>create a venue</p>
-            <form @submit.prevent>
-              <textarea v-model.trim="venue.content"></textarea>
-              <button @click="createVenue" :disabled="venue.content == ''" class="button">venue</button>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div>
-        <h2>
-          <router-link to="/add-venue">Add venue</router-link>
-        </h2>
-        <h2>Venue List</h2>
-      </div>
       <div class="col2">
+        <div id="title">
+          <h2>Venue List</h2>
+        </div>
         <transition name="fade">
           <div v-if="hiddenVenues.length" @click="showNewVenues" class="hidden-venues">
             <p>
@@ -34,7 +19,7 @@
         </transition>
         <div v-if="venues.length">
           <div v-for="venue in venues" class="venue" v-bind:key="venue.id">
-            <h5>{{ venue.userName }}</h5>
+            <h5>{{ venue.name }}</h5>
             <span>{{ venue.createdOn | formatDate }}</span>
             <p>{{ venue.content | trimLength }}</p>
             <ul>
@@ -133,24 +118,24 @@ export default {
     viewReviews(venue) {
       router.push({ name: "VenueDetails", params: { id: venue.key } });
     },
-    createVenue() {
-      fb.venuesCollection
-        .add({
-          createdOn: new Date(),
-          content: this.venue.content,
-          userId: this.currentUser.uid,
-          userName: this.userProfile.name,
-          reviews: 0,
-          likes: 0
-        })
-        // eslint-disable-next-line no-unused-vars
-        .then(ref => {
-          this.venue.content = "";
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
+    // createVenue() {
+    //   fb.venuesCollection
+    //     .add({
+    //       createdOn: new Date(),
+    //       content: this.venue.content,
+    //       userId: this.currentUser.uid,
+    //       userName: this.userProfile.name,
+    //       reviews: 0,
+    //       likes: 0
+    //     })
+    //     // eslint-disable-next-line no-unused-vars
+    //     .then(ref => {
+    //       this.venue.content = "";
+    //     })
+    //     .catch(err => {
+    //       console.log(err);
+    //     });
+    // },
     showNewVenues() {
       let updatedVenuesArray = this.hiddenVenues.concat(this.venues);
       this.$store.commit("setHiddenVenues", null);

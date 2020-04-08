@@ -1,88 +1,68 @@
 <template>
-  <div>
-      <h2>
-        Add Venue
-        <router-link to="/venue-list">Back to venues</router-link>
-      </h2>
-      <div>
-        <form @submit="onSubmit">
-          <form-group
-            id="nameGroup"
-            horizontal
-            :label-cols="4"
-            breakpoint="md"
-            label="Enter name"
-          >
-            <form-input id="name" v-model.trim="venue.name"></form-input>
-          </form-group>
-          <form-group
-            id="descGroup"
-            horizontal
-            :label-cols="4"
-            breakpoint="md"
-            label="Enter description"
-          >
-            <form-textarea
-              id="description"
-              v-model="venue.description"
-              placeholder="Enter something"
-              :rows="2"
-              :max-rows="6"
-            >{{venue.description}}</form-textarea>
-          </form-group>
-          <form-group
-            id="locationGroup"
-            horizontal
-            :label-cols="4"
-            breakpoint="md"
-            label="Enter location"
-          >
-            <form-input id="location" v-model.trim="venue.location"></form-input>
-          </form-group>
-          <button type="submit" variant="primary">Save</button>
-        </form>
-      </div>
-  </div>
+  <section id="add-venue">
+        <div class="col1">
+          <div class="profile">
+            <h3>Add venue</h3>
+            <div class="create-venue">
+              <form @submit.prevent>
+                <label for="name">Name</label>
+                <input v-model.trim="venue.name" type="text" placeholder="Your favorite bar's name" />
+                <label for="name">Description</label>
+                <input v-model.trim="venue.content" type="text" placeholder="Draught beer bar" />
+                <label for="name">Location</label>
+                <input
+                  v-model.trim="venue.location"
+                  type="text"
+                  placeholder="Patriarh Evtimii Street 35"
+                />
+                <button @click="createVenue" :disabled="venue.content == ''" class="button">Submit</button>
+              </form>
+            </div>
+          </div>
+    </div>
+  </section>
 </template>
 
 <script>
-const fb = require('../firebase.js')
-import router from "../router";
+import { mapState } from "vuex";
+const fb = require("../firebase.js");
+// import router from "../router";
 
 export default {
   name: "AddVenue",
   data() {
     return {
-      ref: fb.firestore().collection("venues"),
-      venue: {},
-      review: {},
-
-      reviews: []
+      venue: {
+        name: "",
+        content: "",
+        location: ""
+      }
     };
   },
-    beforeCreate() {
-    this.$emit("onAuth", fb.auth().currentUser !== null);
+  computed: {
+    ...mapState(["userProfile", "currentUser", "venues", "hiddenVenues"])
   },
   methods: {
-    onSubmit(evt) {
-      (this.venue.rating = 0), (this.venue.reviewsCount = 0);
-      this.venue.reviews = [];
-      evt.preventDefault();
-      
-      this.ref
-        .add(this.venue)
-        // eslint-disable-next-line no-unused-vars
-        .then(doc => {
-          this.venue.name = "";
-          this.venue.description = "";
-          this.venue.location = "";
-          router.push({
-            name: "VenueList"
-          });
+    createVenue() {
+      fb.venuesCollection
+        .add({
+          createdOn: new Date(),
+          name: this.venue.name,
+          content: this.venue.content,
+          location: this.venue.location,
+          userId: this.currentUser.uid,
+          userName: this.userProfile.name,
+          reviews: 0,
+          likes: 0
         })
-        .catch(error => {
-          alert("Error adding document: ", error);
+        // eslint-disable-next-line no-unused-vars
+        .then(ref => {
+          this.venue.content = "";
+        })
+        .catch(err => {
+          console.log(err);
         });
+      this.$router.push("/venue-list");
     }
   }
 };
