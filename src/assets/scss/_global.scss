@@ -1,7 +1,5 @@
-// imports
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
 
-// colors
 $primary: #9e5e6f;
 $error: #ef5777;
 $success: #1abc9c;
@@ -9,7 +7,7 @@ $light: #F5F8FA;
 $medium: #657786;
 $dark: #34495E;
 $white: #fff;
-// resets
+
 body {
 	margin: 0;
 	color: $dark;
@@ -30,7 +28,7 @@ html {
 		outline: none;
 	}
 }
-// fonts
+
 h1,
 h2,
 h3,
@@ -76,7 +74,6 @@ a {
 	}
 }
 
-// globals
 section {
 	display: flex;
 	max-width: 1200px;
@@ -202,7 +199,7 @@ form {
         font-size: 16px;
     }
 }
-// transitions
+
 .fade-enter-active {
 	transition: opacity 0.5s;
 }

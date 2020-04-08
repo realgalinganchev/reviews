@@ -1,7 +1,6 @@
 import firebase from 'firebase'
 import 'firebase/firestore'
 
-// firebase init goes here
 const config = {
     apiKey: "AIzaSyBOGJhvJ-WfAChcOp2klWry_8NgFTcFxck",
     authDomain: "reviews-system-230d4.firebaseapp.com",
@@ -14,12 +13,12 @@ const config = {
 }
 firebase.initializeApp(config)
 
-// firebase utils
+
 const db = firebase.firestore()
 const auth = firebase.auth()
 const currentUser = auth.currentUser
 
-// firebase collections
+
 const usersCollection = db.collection('users')
 const venuesCollection = db.collection('venues')
 const reviewsCollection = db.collection('reviews')

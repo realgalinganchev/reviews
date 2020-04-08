@@ -19,12 +19,6 @@
           <router-link to="/add-venue">Add venue</router-link>
         </h2>
         <h2>Venue List</h2>
-
-        <table striped hover :items="venues" :fields="fields">
-          <template slot="cell(actions)" slot-scope="row">
-            <btn size="sm" @click.stop="viewReviews(row.item)">View Reviews</btn>
-          </template>
-        </table>
       </div>
       <div class="col2">
         <transition name="fade">
@@ -111,7 +105,7 @@
 import { mapState } from "vuex";
 import moment from "moment";
 const fb = require("../firebase.js");
-// const venuesCollection = require("../firebase.js");
+
 import router from "../router";
 export default {
   data() {
@@ -125,46 +119,13 @@ export default {
         content: "",
         venueReviews: 0
       },
-            fields: [
-        {
-          name: { label: "Name", class: "text-left" }
-        },
-        {
-          actions: { label: "Action", class: "text-center" }
-        },
-        {
-          reviewsCount: { label: "Reviewed", class: "text-center" }
-        },
-        {
-          rating: { label: "Rating", class: "text-center  " }
-        },
-        {
-          location: { label: "Location", class: "text-center  " }
-        }
-      ],
-      // venues: [],
       errors: [],
-      // ref: venuesCollection,
       showReviewModal: false,
       showVenueModal: false,
       fullVenue: {},
       venueReviews: []
     };
   },
-  // created() {
-  //   venuesCollection.doc().onSnapshot(querySnapshot => {
-  //     this.venues = [];
-  //     querySnapshot.forEach(doc => {
-  //       this.venues.push({
-  //         key: doc.id,
-  //         name: doc.data().name,
-  //         reviewsCount: doc.data().reviewsCount,
-  //         rating: doc.data().rating,
-  //         location: doc.data().location
-  //       });
-  //     });
-  //   });
-  // },
   computed: {
     ...mapState(["userProfile", "currentUser", "venues", "hiddenVenues"])
   },
@@ -192,7 +153,6 @@ export default {
     },
     showNewVenues() {
       let updatedVenuesArray = this.hiddenVenues.concat(this.venues);
-      // clear hiddenVenues array and update venues array
       this.$store.commit("setHiddenVenues", null);
       this.$store.commit("setVenues", updatedVenuesArray);
     },
@@ -253,7 +213,6 @@ export default {
               userId: this.currentUser.uid
             })
             .then(() => {
-              // update venue likes
               fb.venuesCollection.doc(venueId).update({
                 likes: venueLikes + 1
               });

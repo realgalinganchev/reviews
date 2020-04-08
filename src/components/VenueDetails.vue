@@ -21,7 +21,8 @@
         <btn class="edit-btn" variant="success" @click.stop="editVenue(key)">Edit</btn>
         <btn variant="danger" @click.stop="deleteVenue(key)">Delete</btn>
       </div>
-      <div> v-if="!isHidden">
+      <div>
+        v-if="!isHidden">
         <form @submit="onSubmit">
           <form-group id="descGroup" horizontal breakpoint="md">
             <form-textarea
@@ -35,7 +36,8 @@
           <button type="submit" variant="primary">Submit review</button>
         </form>
       </div>
-      <div> v-if="isHidden">
+      <div>
+        v-if="isHidden">
         <router-link to="/venue-list">Back to venues</router-link>
       </div>
       <div>
@@ -48,11 +50,7 @@
                   <form @submit="deleteReview">
                     <button type="submit" variant="primary">Delete</button>
                   </form>
-                  <button
-                    class="show-desc"
-                    
-                    @click="toggleDescription(r, $event)"
-                  >Edit</button>
+                  <button class="show-desc" @click="toggleDescription(r, $event)">Edit</button>
                 </div>
               </div>
             </template>
@@ -68,11 +66,7 @@
                       :max-rows="10"
                     >{{review.text}}</form-textarea>
                   </form-group>
-                  <button
-                    class="show-desc"
-                    @click="toggleDescription(r)"
-                    
-                  >Save changes</button>
+                  <button class="show-desc" @click="toggleDescription(r)">Save changes</button>
                   <form @submit="deleteReview">
                     <button type="submit" variant="primary">Delete</button>
                   </form>
@@ -87,7 +81,7 @@
 </template>
 
 <script>
-const fb = require('../firebase.js')
+const fb = require("../firebase.js");
 import router from "../router";
 
 export default {
@@ -107,7 +101,6 @@ export default {
       authorEmail: fb.auth().currentUser.email,
       isDeleted: Boolean,
       currEmail: fb.auth().currentUser.email
-      
     };
   },
   beforeCreate() {
@@ -148,12 +141,6 @@ export default {
           alert("Error removing document: ", error);
         });
     },
-    // editReview(id) {
-    //   router.push({
-    //     name: "EditVenue",
-    //     params: { id: id }
-    //   });
-    // },
     onSubmit(evt) {
       evt.preventDefault();
       const currentUser = this.usersRef.doc(fb.auth().currentUser.uid);
@@ -183,8 +170,6 @@ export default {
           alert("You have already submitted a review for this venue!");
         }
       });
-
-      //this.reviews = this.reviews.reverse();
       this.isHidden = true;
     },
     deleteReview(evt) {
@@ -194,13 +179,11 @@ export default {
       const currentVenue = this.ref.doc(this.$route.params.id);
       currentVenue.update({
         reviews: fb.firestore.FieldValue.arrayRemove(...toBeDeleted)
-        // reviewsCount: reviewsCount- 1,
       });
       this.reviews = this.reviews.filter(e => e.author !== this.currEmail);
     },
 
     toggleDescription(r) {
-
       r.showEditField = !r.showEditField;
     },
     editReview(evt) {

@@ -11,7 +11,10 @@
         <p>
           Welcome to the Night Life Sofia - Reviews System. The social media web app powered by Vue.js and Firebase.
           Login to view what others think about the venues or visit us at
-          <a href="https://nightlifesofia.com/" target="_blank">Night Life Sofia</a>
+          <a
+            href="https://nightlifesofia.com/"
+            target="_blank"
+          >Night Life Sofia</a>
         </p>
       </div>
       <div class="col2" :class="{ 'signup-form': !showLoginForm }">
@@ -39,13 +42,21 @@
           <h1>Get Started</h1>
 
           <label for="name">Name</label>
-          <input v-model.trim="signupForm.name" type="text" placeholder="Savvy Apps" id="name" />
-
+          <input v-model.trim="signupForm.name" type="text" placeholder="Name" id="name" />
+          <label for="surname">Surname</label>
+          <input v-model.trim="signupForm.surname" type="text" placeholder="Surname" id="surname" />
+          <label for="phoneNumber">Phone number</label>
+          <input
+            v-model.trim="signupForm.phoneNumber"
+            type="text"
+            placeholder="Phone number"
+            id="phone-number"
+          />
           <label for="email2">Email</label>
           <input
             v-model.trim="signupForm.email"
             type="text"
-            placeholder="you@email.com"
+            placeholder="your@email.com"
             id="email2"
           />
 
@@ -74,7 +85,6 @@
 </template>
 
 <script>
-// import { currentUser } from '../firebase';
 const fb = require("../firebase.js");
 
 export default {
@@ -86,6 +96,8 @@ export default {
       },
       signupForm: {
         name: "",
+        surname: "",
+        phoneNumber: "",
         email: "",
         password: ""
       },
@@ -124,7 +136,7 @@ export default {
     },
     signup() {
       this.performingRequest = true;
- 
+
       fb.auth
         .createUserWithEmailAndPassword(
           this.signupForm.email,
@@ -132,12 +144,13 @@ export default {
         )
         .then(user => {
           this.$store.commit("setCurrentUser", user);
-           
-          // create user obj
+
           fb.usersCollection
             .doc(user.user.uid)
             .set({
               name: this.signupForm.name,
+              surname: this.signupForm.surname,
+              phoneNumber: this.signupForm.phoneNumber
             })
             .then(() => {
               this.$store.dispatch("fetchUserProfile");
@@ -155,7 +168,7 @@ export default {
           this.performingRequest = false;
           this.errorMsg = err.message;
         });
-    },
+    }
   }
 };
 </script>

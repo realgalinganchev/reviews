@@ -69,20 +69,3 @@ export default {
     padding: 2rem;
   }
 </style>
-
-    editReview(id) {
-      router.push({
-        name: "EditVenue",
-        params: { id: id }
-      });
-    },
-    deleteReview() {
-      const toBeDeleted = this.reviews.filter(e => e.author === fb.auth().currentUser.email);
-      // console.log(JSON.stringify(test));
-      const currentVenue = this.ref.doc(this.$route.params.id);
-      currentVenue.update({
-        reviews: fb.firestore.FieldValue.arrayRemove(...toBeDeleted)
-        // reviewsCount: reviewsCount- 1,
-      });
-      this.key += 1;
-    },
