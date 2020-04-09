@@ -7,7 +7,6 @@ import Login from '../views/Login.vue'
 import VenueList from '../components/VenueList.vue'
 import VenueDetails from '../components/VenueDetails.vue'
 import AddVenue from '../components/AddVenue.vue'
-import EditVenue from '../components/EditVenue.vue'
 import Profile from '../components/Profile.vue'
 
 Vue.use(Router)
@@ -31,14 +30,6 @@ const router = new Router({
       meta: {
         requiresAuth: true
       }
-    },
-    {
-      path: '/edit-venue',
-      name: 'EditVenue',
-      component: EditVenue,
-      meta: {
-        requiresAuth: true
-      }   
     },
     {
       path: '/venue-details/:id',

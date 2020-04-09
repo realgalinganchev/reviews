@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 <template>
   <div id="venue-list">
     <section>
@@ -21,6 +20,9 @@
               <li>
                 <a @click="viewVenue(venue)">view all {{ venue.reviews }} reviews</a>
               </li>
+              <li>
+                <a @click="deleteVenue(venue)">delete</a>
+              </li>
             </ul>
           </div>
         </div>
@@ -40,35 +42,6 @@
             <textarea v-model.trim="review.content"></textarea>
             <button @click="addReview" :disabled="review.content == ''" class="button">add review</button>
           </form>
-        </div>
-      </div>
-    </transition>
-
-    <!-- venue modal -->
-    <transition name="fade">
-      <div v-if="showVenueModal" class="p-modal">
-        <div class="p-container">
-          <a @click="closeVenueModal" class="close">X</a>
-          <div class="venue">
-            <h5>{{ fullVenue.name }}</h5>
-            <span>{{ fullVenue.createdOn | formatDate }}</span>
-            <p>{{ fullVenue.description }}</p>
-            <ul>
-              <li>
-                <a>reviews {{ fullVenue.reviews }}</a>
-              </li>
-              <li>
-                <a>likes {{ fullVenue.likes }}</a>
-              </li>
-            </ul>
-          </div>
-          <div v-show="venueReviews.length" class="reviews">
-            <div v-for="review in venueReviews" class="review" v-bind:key="review.id">
-              <p>{{ review.userName }}</p>
-              <span>{{ review.createdOn | formatDate }}</span>
-              <p>{{ review.content }}</p>
-            </div>
-          </div>
         </div>
       </div>
     </transition>
@@ -96,19 +69,14 @@ export default {
       },
       errors: [],
       showReviewModal: false,
-      showVenueModal: false,
       fullVenue: {},
       venueReviews: []
     };
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "venues"])
+    ...mapState(["userProfile", "currentUser", "venues", "reviews"])
   },
   methods: {
-    // viewReviews(venue) {
-    //   router.push({ name: "VenueDetails", params: { id: venue.key } });
-    // },
-
     openReviewModal(venue) {
       this.review.venueId = venue.id;
       this.review.venueName = venue.name;
@@ -137,8 +105,7 @@ export default {
           userName: this.userProfile.name,
           venueName: venueName
         })
-        // eslint-disable-next-line no-unused-vars
-        .then(doc => {
+        .then(() => {
           fb.venuesCollection
             .doc(venueId)
             .update({
@@ -189,11 +156,18 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    deleteVenue(venue) {
+      fb.venuesCollection
+        .doc(venue.id)
+        .delete()
+        .then(function() {
+          console.log("Document successfully deleted!");
+        })
+        .catch(function(error) {
+          console.error("Error removing document: ", error);
+        });
     }
-    // closeVenueModal() {
-    //   this.venueReviews = [];
-    //   this.showVenueModal = false;
-    // }
   },
   filters: {
     formatDate(val) {
@@ -203,12 +177,6 @@ export default {
       let date = val.toDate();
       return moment(date).fromNow();
     }
-    // trimLength(val) {
-    //   if (val.length < 200) {
-    //     return val;
-    //   }
-    //   return `${val.substring(0, 200)}...`;
-    // }
   }
 };
 </script>

@@ -20,6 +20,9 @@
           <p>{{ review.content }}</p>
           <span>{{ review.createdOn | formatDate }}</span>
           <p>by {{ review.userName }}</p>
+          <li>
+            <button @click="deleteReview(review)">delete</button>
+          </li>
         </div>
       </div>
     </div>
@@ -27,7 +30,7 @@
 </template>
 
 <script>
-// import { mapState } from "vuex";
+import { mapState } from "vuex";
 import moment from "moment";
 const fb = require("../firebase.js");
 
@@ -44,7 +47,6 @@ export default {
       },
       errors: [],
       // showReviewModal: false,
-      // showVenueModal: false,
       fullVenue: {},
       venueReviews: []
     };
@@ -52,7 +54,7 @@ export default {
   created() {
     fb.reviewsCollection
       .where("venueId", "==", this.$route.params.id)
-      .orderBy("createdOn", "desc") 
+      .orderBy("createdOn", "desc")
       .get()
       .then(docs => {
         let reviewsArray = [];
@@ -65,8 +67,6 @@ export default {
 
         this.venueReviews = reviewsArray;
         this.fullVenue = this.venue;
-        // console.log(JSON.stringify(this.fullVenue));
-        // this.showVenueModal = true;
       })
       .catch(err => {
         console.log(err);
@@ -75,6 +75,23 @@ export default {
       this.venue = doc.data();
     });
   },
+  computed: {
+    ...mapState(["userProfile", "currentUser", "venues", "reviews"])
+  },
+  methods: {
+    deleteReview(review) {
+      fb.reviewsCollection
+        .doc(review.id)
+        .delete()
+        .then(function() {
+          console.log("Document successfully deleted!");
+        })
+        .catch(function(error) {
+          console.error("Error removing document: ", error);
+        });
+    }
+  },
+
   filters: {
     formatDate(val) {
       if (!val) {

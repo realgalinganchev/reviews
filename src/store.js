@@ -16,16 +16,29 @@ fb.auth.onAuthStateChanged(user => {
 
         // realtime updates from our venues collection
         fb.venuesCollection.orderBy('createdOn', 'desc').onSnapshot(querySnapshot => {
-                let venuesArray = [];
+            let venuesArray = [];
 
-                querySnapshot.forEach(doc => {
-                    let venue = doc.data();
-                    venue.id = doc.id;
-                    venuesArray.push(venue);
-                })
+            querySnapshot.forEach(doc => {
+                let venue = doc.data();
+                venue.id = doc.id;
+                venuesArray.push(venue);
+            })
 
-                store.commit('setVenues', venuesArray);
-            
+            store.commit('setVenues', venuesArray);
+
+        });
+        // realtime updates from our reviews collection
+        fb.reviewsCollection.orderBy('createdOn', 'desc').onSnapshot(querySnapshot => {
+            let reviewsArray = [];
+
+            querySnapshot.forEach(doc => {
+                let review = doc.data();
+                review.id = doc.id;
+                reviewsArray.push(review);
+            })
+
+            store.commit('setReviews', reviewsArray);
+
         })
     }
 })
@@ -35,6 +48,7 @@ export const store = new Vuex.Store({
         currentUser: null,
         userProfile: {},
         venues: [],
+        reviews: [],
 
     },
     actions: {
@@ -42,6 +56,7 @@ export const store = new Vuex.Store({
             commit('setCurrentUser', null);
             commit('setUserProfile', {});
             commit('setVenues', null);
+            commit('setReviews', null);
 
         },
         fetchUserProfile({ commit, state }) {
@@ -96,6 +111,13 @@ export const store = new Vuex.Store({
                 state.venues = val;
             } else {
                 state.venues = [];
+            }
+        },
+        setReviews(state, val) {
+            if (val) {
+                state.reviews = val;
+            } else {
+                state.reviews = [];
             }
         }
     }
