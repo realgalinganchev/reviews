@@ -6,31 +6,20 @@
         <div id="title">
           <h2>Venue List</h2>
         </div>
-        <transition name="fade">
-          <div v-if="hiddenVenues.length" @click="showNewVenues" class="hidden-venues">
-            <p>
-              Click to show
-              <span class="new-venues">{{ hiddenVenues.length }}</span>
-              new
-              <span v-if="hiddenVenues.length > 1">venues</span>
-              <span v-else>venue</span>
-            </p>
-          </div>
-        </transition>
         <div v-if="venues.length">
           <div v-for="venue in venues" class="venue" v-bind:key="venue.id">
             <h5>{{ venue.name }}</h5>
             <span>{{ venue.createdOn | formatDate }}</span>
-            <p>{{ venue.content | trimLength }}</p>
+            <p>{{ venue.description }}</p>
             <ul>
               <li>
-                <a @click="openReviewModal(venue)">add a review {{ venue.reviews }}</a>
+                <a @click="openReviewModal(venue)">add a review</a>
               </li>
               <li>
                 <a @click="likeVenue(venue.id, venue.likes)">likes {{ venue.likes }}</a>
               </li>
               <li>
-                <a @click="viewVenue(venue)">view all reviews</a>
+                <a @click="viewVenue(venue)">view all {{ venue.reviews }} reviews</a>
               </li>
             </ul>
           </div>
@@ -61,9 +50,9 @@
         <div class="p-container">
           <a @click="closeVenueModal" class="close">X</a>
           <div class="venue">
-            <h5>{{ fullVenue.userName }}</h5>
+            <h5>{{ fullVenue.name }}</h5>
             <span>{{ fullVenue.createdOn | formatDate }}</span>
-            <p>{{ fullVenue.content }}</p>
+            <p>{{ fullVenue.description }}</p>
             <ul>
               <li>
                 <a>reviews {{ fullVenue.reviews }}</a>
@@ -96,10 +85,11 @@ export default {
   data() {
     return {
       venue: {
-        content: ""
+        description: ""
       },
       review: {
         venueId: "",
+        venueName: "",
         userId: "",
         content: "",
         venueReviews: 0
@@ -112,49 +102,30 @@ export default {
     };
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "venues", "hiddenVenues"])
+    ...mapState(["userProfile", "currentUser", "venues"])
   },
   methods: {
-    viewReviews(venue) {
-      router.push({ name: "VenueDetails", params: { id: venue.key } });
-    },
-    // createVenue() {
-    //   fb.venuesCollection
-    //     .add({
-    //       createdOn: new Date(),
-    //       content: this.venue.content,
-    //       userId: this.currentUser.uid,
-    //       userName: this.userProfile.name,
-    //       reviews: 0,
-    //       likes: 0
-    //     })
-    //     // eslint-disable-next-line no-unused-vars
-    //     .then(ref => {
-    //       this.venue.content = "";
-    //     })
-    //     .catch(err => {
-    //       console.log(err);
-    //     });
+    // viewReviews(venue) {
+    //   router.push({ name: "VenueDetails", params: { id: venue.key } });
     // },
-    showNewVenues() {
-      let updatedVenuesArray = this.hiddenVenues.concat(this.venues);
-      this.$store.commit("setHiddenVenues", null);
-      this.$store.commit("setVenues", updatedVenuesArray);
-    },
+
     openReviewModal(venue) {
       this.review.venueId = venue.id;
+      this.review.venueName = venue.name;
       this.review.userId = venue.userId;
       this.review.venueReviews = venue.reviews;
       this.showReviewModal = true;
     },
     closeReviewModal() {
       this.review.venueId = "";
+      this.review.venueName = "";
       this.review.userId = "";
       this.review.content = "";
       this.showReviewModal = false;
     },
     addReview() {
       let venueId = this.review.venueId;
+      let venueName = this.review.venueName;
       let venueReviews = this.review.venueReviews;
 
       fb.reviewsCollection
@@ -163,7 +134,8 @@ export default {
           content: this.review.content,
           venueId: venueId,
           userId: this.currentUser.uid,
-          userName: this.userProfile.name
+          userName: this.userProfile.name,
+          venueName: venueName
         })
         // eslint-disable-next-line no-unused-vars
         .then(doc => {
@@ -211,27 +183,17 @@ export default {
       fb.reviewsCollection
         .where("venueId", "==", venue.id)
         .get()
-        .then(docs => {
-          let reviewsArray = [];
-
-          docs.forEach(doc => {
-            let review = doc.data();
-            review.id = doc.id;
-            reviewsArray.push(review);
-          });
-
-          this.venueReviews = reviewsArray;
-          this.fullVenue = venue;
-          this.showVenueModal = true;
+        .then(() => {
+          router.push({ name: "VenueDetails", params: { id: venue.id } });
         })
         .catch(err => {
           console.log(err);
         });
-    },
-    closeVenueModal() {
-      this.venueReviews = [];
-      this.showVenueModal = false;
     }
+    // closeVenueModal() {
+    //   this.venueReviews = [];
+    //   this.showVenueModal = false;
+    // }
   },
   filters: {
     formatDate(val) {
@@ -240,13 +202,13 @@ export default {
       }
       let date = val.toDate();
       return moment(date).fromNow();
-    },
-    trimLength(val) {
-      if (val.length < 200) {
-        return val;
-      }
-      return `${val.substring(0, 200)}...`;
     }
+    // trimLength(val) {
+    //   if (val.length < 200) {
+    //     return val;
+    //   }
+    //   return `${val.substring(0, 200)}...`;
+    // }
   }
 };
 </script>

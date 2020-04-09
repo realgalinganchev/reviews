@@ -7,13 +7,13 @@
         </router-link>
         <ul class="inline">
           <li>
-            <router-link to="venue-list">Venue List</router-link>
+            <router-link to="/venue-list">Venue List</router-link>
           </li>
           <li>
             <router-link to="/add-venue">Add venue</router-link>
           </li>
           <li>
-            <router-link to="profile">Profile</router-link>
+            <router-link to="/profile">Profile</router-link>
           </li>
 
           <li>

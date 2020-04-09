@@ -8,14 +8,14 @@
                 <label for="name">Name</label>
                 <input v-model.trim="venue.name" type="text" placeholder="Your favorite bar's name" />
                 <label for="name">Description</label>
-                <input v-model.trim="venue.content" type="text" placeholder="Draught beer bar" />
+                <input v-model.trim="venue.description" type="text" placeholder="Draught beer bar" />
                 <label for="name">Location</label>
                 <input
                   v-model.trim="venue.location"
                   type="text"
                   placeholder="Patriarh Evtimii Street 35"
                 />
-                <button @click="createVenue" :disabled="venue.content == ''" class="button">Submit</button>
+                <button @click="createVenue" :disabled="venue.name == '' || venue.description == '' || venue.location == ''" class="button">Submit</button>
               </form>
             </div>
           </div>
@@ -34,13 +34,13 @@ export default {
     return {
       venue: {
         name: "",
-        content: "",
+        description: "",
         location: ""
       }
     };
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "venues", "hiddenVenues"])
+    ...mapState(["userProfile", "currentUser", "venues"])
   },
   methods: {
     createVenue() {
@@ -48,7 +48,7 @@ export default {
         .add({
           createdOn: new Date(),
           name: this.venue.name,
-          content: this.venue.content,
+          description: this.venue.description,
           location: this.venue.location,
           userId: this.currentUser.uid,
           userName: this.userProfile.name,
@@ -57,7 +57,7 @@ export default {
         })
         // eslint-disable-next-line no-unused-vars
         .then(ref => {
-          this.venue.content = "";
+          this.venue.description = "";
         })
         .catch(err => {
           console.log(err);
