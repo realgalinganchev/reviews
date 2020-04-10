@@ -2,7 +2,10 @@
   <div id="venue-list">
     <section>
       <div class="col2">
-        <div id="title">
+        <div class="title">
+          <transition name="fade">
+            <p v-if="showFailureVenue" class="failure">You have not created this venue!</p>
+          </transition>
           <h2>Venue List</h2>
         </div>
         <div v-if="venues.length">
@@ -43,7 +46,7 @@
             <textarea v-model.trim="review.content"></textarea>
             <button @click="addReview" :disabled="review.content == ''" class="button">Add review</button>
             <transition name="fade">
-              <p v-if="showFailure" class="failure">You have already reviewed this venue!</p>
+              <p v-if="showFailureReview" class="failure">You have already reviewed this venue!</p>
             </transition>
           </form>
         </div>
@@ -75,11 +78,12 @@ export default {
       showReviewModal: false,
       fullVenue: {},
       venueReviews: [],
-      showFailure: false
+      showFailureReview: false,
+      showFailureVenue: false
     };
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "venues", "reviews"])
+    ...mapState(["userProfile", "currentUser", "venues"])
   },
   methods: {
     openReviewModal(venue) {
@@ -107,10 +111,10 @@ export default {
         .get()
         .then(doc => {
           if (doc.exists) {
-            this.showFailure = true;
+            this.showFailureReview = true;
 
             setTimeout(() => {
-              this.showFailure = false;
+              this.showFailureReview = false;
             }, 4000);
             return;
           } else {
@@ -181,18 +185,22 @@ export default {
     deleteVenue(venue) {
       fb.venuesCollection
         .doc(venue.id)
-        .delete()
-        .then(function() {
-          console.log("Document successfully deleted!");
-        })
-        .catch(function(error) {
-          console.error("Error removing document: ", error);
+        .get()
+        .then(doc => {
+          if (doc.data().userId !== this.currentUser.uid) {
+            this.showFailureVenue = true;
+
+            setTimeout(() => {
+              this.showFailureVenue = false;
+            }, 4000);
+            return;
+          } else {
+            let docId = `${this.currentUser.uid}_${venue.id}`;
+            fb.venuesCollection.doc(venue.id).delete();
+            fb.likesCollection.doc(docId).delete();
+            fb.reviewsCollection.doc(docId).delete();
+          }
         });
-      let docId = `${this.currentUser.uid}_${venue.id}`;
-
-      fb.likesCollection.doc(docId).delete();
-
-      fb.reviewsCollection.doc(docId).delete();
     }
   },
   filters: {

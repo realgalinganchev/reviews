@@ -1,6 +1,9 @@
 <template >
   <div>
-    <div id="venue-title">
+    <div class="title">
+      <transition name="fade">
+        <p v-if="showFailure" class="failure">You have not submitted this review!</p>
+      </transition>
       <h2>{{ venue.name }}</h2>
     </div>
     <div class="p-modal">
@@ -16,7 +19,7 @@
             </li>
           </ul>
         </div>
-        <div v-show="venueReviews.length" class="reviews">
+        <div v-show="venueReviews.length" class="review">
           <div v-for="review in venueReviews" class="review" v-bind:key="review.id">
             <h5>{{review.content | trimLength}}...</h5>
             <p>{{ review.content }}</p>
@@ -49,9 +52,9 @@ export default {
         venueReviews: 0
       },
       errors: [],
-      // showReviewModal: false,
       fullVenue: {},
-      venueReviews: []
+      venueReviews: [],
+      showFailure: false
     };
   },
   created() {
@@ -83,43 +86,45 @@ export default {
   },
   methods: {
     deleteReview(review) {
-      fb.reviewsCollection
-        .doc(review.id)
-        .delete()
-        .then(function() {
-          console.log("Document successfully deleted!");
-        })
-        .catch(function(error) {
-          console.error("Error removing document: ", error);
-        });
-      fb.reviewsCollection
-        .where("venueId", "==", this.$route.params.id)
-        .orderBy("createdOn", "desc")
-        .get()
-        .then(docs => {
-          let reviewsArray = [];
+      if (this.currentUser.uid !== review.userId) {
+        this.showFailure = true;
 
-          docs.forEach(doc => {
-            let review = doc.data();
-            review.id = doc.id;
-            reviewsArray.push(review);
-          });
-
-          this.venueReviews = reviewsArray;
-          this.fullVenue = this.venue;
-        })
-        .catch(err => {
-          console.log(err);
-        });
-      let updatedReviews = this.venue.reviews;
-      if (updatedReviews >= 1) {
-        fb.venuesCollection.doc(this.$route.params.id).update({
-          reviews: updatedReviews - 1
-        });
+        setTimeout(() => {
+          this.showFailure = false;
+        }, 4000);
+        return;
       } else {
-        fb.venuesCollection.doc(this.$route.params.id).update({
-          reviews: 0
-        });
+        fb.reviewsCollection.doc(review.id).delete();
+
+        fb.reviewsCollection
+          .where("venueId", "==", this.$route.params.id)
+          .orderBy("createdOn", "desc")
+          .get()
+          .then(docs => {
+            let reviewsArray = [];
+
+            docs.forEach(doc => {
+              let review = doc.data();
+              review.id = doc.id;
+              reviewsArray.push(review);
+            });
+
+            this.venueReviews = reviewsArray;
+            this.fullVenue = this.venue;
+          })
+          .catch(err => {
+            console.log(err);
+          });
+        let updatedReviews = this.venue.reviews;
+        if (updatedReviews >= 1) {
+          fb.venuesCollection.doc(this.$route.params.id).update({
+            reviews: updatedReviews - 1
+          });
+        } else {
+          fb.venuesCollection.doc(this.$route.params.id).update({
+            reviews: 0
+          });
+        }
       }
     }
   },
