@@ -8,20 +8,21 @@
         <div v-if="venues.length">
           <div v-for="venue in venues" class="venue" v-bind:key="venue.id">
             <h5>{{ venue.name }}</h5>
-            <span>{{ venue.createdOn | formatDate }}</span>
+            <!-- <span>{{ venue.createdOn | formatDate }}</span> -->
             <p>{{ venue.description }}</p>
             <ul>
               <li>
-                <a @click="openReviewModal(venue)">add a review</a>
+                <a @click="viewVenue(venue)">View all {{ venue.reviews }} reviews ⭐</a>
               </li>
               <li>
-                <a @click="likeVenue(venue.id, venue.likes)">likes {{ venue.likes }}</a>
+                <a @click="openReviewModal(venue)">Add a review ➕</a>
               </li>
               <li>
-                <a @click="viewVenue(venue)">view all {{ venue.reviews }} reviews</a>
+                <a @click="likeVenue(venue.id, venue.likes)">Likes {{ venue.likes }} 👍</a>
               </li>
+
               <li>
-                <a @click="deleteVenue(venue)">delete</a>
+                <a @click="deleteVenue(venue)">Delete ❌</a>
               </li>
             </ul>
           </div>
@@ -37,10 +38,13 @@
       <div v-if="showReviewModal" class="c-modal">
         <div class="c-container">
           <a @click="closeReviewModal">X</a>
-          <p>add a review</p>
+          <p>How was your experience here?</p>
           <form @submit.prevent>
             <textarea v-model.trim="review.content"></textarea>
-            <button @click="addReview" :disabled="review.content == ''" class="button">add review</button>
+            <button @click="addReview" :disabled="review.content == ''" class="button">Add review</button>
+            <transition name="fade">
+              <p v-if="showFailure" class="failure">You have already reviewed this venue!</p>
+            </transition>
           </form>
         </div>
       </div>
@@ -70,7 +74,8 @@ export default {
       errors: [],
       showReviewModal: false,
       fullVenue: {},
-      venueReviews: []
+      venueReviews: [],
+      showFailure: false
     };
   },
   computed: {
@@ -95,28 +100,44 @@ export default {
       let venueId = this.review.venueId;
       let venueName = this.review.venueName;
       let venueReviews = this.review.venueReviews;
+      let docId = `${this.currentUser.uid}_${venueId}`;
 
       fb.reviewsCollection
-        .add({
-          createdOn: new Date(),
-          content: this.review.content,
-          venueId: venueId,
-          userId: this.currentUser.uid,
-          userName: this.userProfile.name,
-          venueName: venueName
-        })
-        .then(() => {
-          fb.venuesCollection
-            .doc(venueId)
-            .update({
-              reviews: venueReviews + 1
-            })
-            .then(() => {
-              this.closeReviewModal();
-            });
-        })
-        .catch(err => {
-          console.log(err);
+        .doc(docId)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            this.showFailure = true;
+
+            setTimeout(() => {
+              this.showFailure = false;
+            }, 4000);
+            return;
+          } else {
+            fb.reviewsCollection
+              .doc(docId)
+              .set({
+                createdOn: new Date(),
+                content: this.review.content,
+                venueId: venueId,
+                userId: this.currentUser.uid,
+                userName: this.userProfile.name,
+                venueName: venueName
+              })
+              .then(() => {
+                fb.venuesCollection
+                  .doc(venueId)
+                  .update({
+                    reviews: venueReviews + 1
+                  })
+                  .then(() => {
+                    this.closeReviewModal();
+                  });
+              })
+              .catch(err => {
+                console.log(err);
+              });
+          }
         });
     },
     likeVenue(venueId, venueLikes) {
@@ -167,6 +188,11 @@ export default {
         .catch(function(error) {
           console.error("Error removing document: ", error);
         });
+      let docId = `${this.currentUser.uid}_${venue.id}`;
+
+      fb.likesCollection.doc(docId).delete();
+
+      fb.reviewsCollection.doc(docId).delete();
     }
   },
   filters: {

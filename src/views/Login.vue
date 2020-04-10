@@ -99,7 +99,7 @@ export default {
         surname: "",
         phoneNumber: "",
         email: "",
-        password: ""
+        password: "",
       },
       passwordForm: {
         email: ""
@@ -150,7 +150,7 @@ export default {
             .set({
               name: this.signupForm.name,
               surname: this.signupForm.surname,
-              phoneNumber: this.signupForm.phoneNumber
+              phoneNumber: this.signupForm.phoneNumber,
             })
             .then(() => {
               this.$store.dispatch("fetchUserProfile");

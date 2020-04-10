@@ -1,27 +1,31 @@
 <template >
-  <div class="p-modal">
-    <div class="p-container">
-      <div id="venue-details">
-        <h4>{{ venue.name }}</h4>
-        <p>{{ venue.description }}</p>
-        <ul>
-          <li>
-            <a>reviews {{ venue.reviews }}</a>
-          </li>
-          <li>
-            <a>likes {{ venue.likes }}</a>
-          </li>
-        </ul>
-      </div>
-      <div v-show="venueReviews.length" class="reviews">
-        <div v-for="review in venueReviews" class="review" v-bind:key="review.id">
-          <h5>{{review.content | trimLength}}...</h5>
-          <p>{{ review.content }}</p>
-          <span>{{ review.createdOn | formatDate }}</span>
-          <p>by {{ review.userName }}</p>
-          <li>
-            <button @click="deleteReview(review)">delete</button>
-          </li>
+  <div>
+    <div id="venue-title">
+      <h2>{{ venue.name }}</h2>
+    </div>
+    <div class="p-modal">
+      <div class="p-container">
+        <div id="venue-details">
+          <p>{{ venue.description }}</p>
+          <ul>
+            <li>
+              <a>reviews {{ venue.reviews }}</a>
+            </li>
+            <li>
+              <a>likes {{ venue.likes }}</a>
+            </li>
+          </ul>
+        </div>
+        <div v-show="venueReviews.length" class="reviews">
+          <div v-for="review in venueReviews" class="review" v-bind:key="review.id">
+            <h5>{{review.content | trimLength}}...</h5>
+            <p>{{ review.content }}</p>
+            <span>{{ review.createdOn | formatDate }}</span>
+            <p>by {{ review.userName }}</p>
+            <li>
+              <a @click="deleteReview(review)">Delete ❌</a>
+            </li>
+          </div>
         </div>
       </div>
     </div>
@@ -79,7 +83,6 @@ export default {
   },
   methods: {
     deleteReview(review) {
-
       fb.reviewsCollection
         .doc(review.id)
         .delete()
@@ -108,13 +111,13 @@ export default {
         .catch(err => {
           console.log(err);
         });
-              let updatedReviews = this.venue.reviews;
+      let updatedReviews = this.venue.reviews;
       if (updatedReviews >= 1) {
         fb.venuesCollection.doc(this.$route.params.id).update({
           reviews: updatedReviews - 1
         });
       } else {
-       fb.venuesCollection.doc(this.$route.params.id).update({
+        fb.venuesCollection.doc(this.$route.params.id).update({
           reviews: 0
         });
       }

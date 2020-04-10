@@ -146,6 +146,11 @@ header {
             border-radius: 0 0 3px 3px;
         }
     }
+    
+    .failure{
+        color: $failure;
+        margin: 0.5rem 0 -2rem;
+    }
 
     }
     .venue {
@@ -337,17 +342,10 @@ header {
 }
 #venue-details {
     margin-top: 3rem;
-
-    
-        max-width: 600px;
-        margin: 5vh auto 0;
-        background: $white;
-        padding: 2rem;
-    
-
-    form {
-        margin-top: 3rem;
-    }
+    max-width: 600px;
+    margin: 5vh auto 0;
+    background: $white;
+    padding: 2rem;
 
     .success {
         color: $success;
@@ -357,4 +355,8 @@ header {
     .button {
         margin-top: 2rem;
     }
+}
+#venue-title{
+    text-align: center;
+    margin-top: 45px;
 }
