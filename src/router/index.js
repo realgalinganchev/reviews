@@ -9,7 +9,7 @@ import VenueDetails from '../components/VenueDetails.vue'
 import AddVenue from '../components/AddVenue.vue'
 import Profile from '../components/Profile.vue'
 
-Vue.use(Router)
+Vue.use(Router);
 
 const router = new Router({
   mode: 'history',

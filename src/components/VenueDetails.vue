@@ -1,9 +1,8 @@
 <template >
   <div class="p-modal">
     <div class="p-container">
-      <div class="venue">
+      <div id="venue-details">
         <h4>{{ venue.name }}</h4>
-        <!-- <span>{{ venue.createdOn | formatDate }}</span> -->
         <p>{{ venue.description }}</p>
         <ul>
           <li>
@@ -80,7 +79,7 @@ export default {
   },
   methods: {
     deleteReview(review) {
-      let updatedReviews = this.venue.reviews;
+
       fb.reviewsCollection
         .doc(review.id)
         .delete()
@@ -109,9 +108,16 @@ export default {
         .catch(err => {
           console.log(err);
         });
-      fb.venuesCollection.doc(this.$route.params.id).update({
-                reviews:  updatedReviews - 1
-              });
+              let updatedReviews = this.venue.reviews;
+      if (updatedReviews >= 1) {
+        fb.venuesCollection.doc(this.$route.params.id).update({
+          reviews: updatedReviews - 1
+        });
+      } else {
+       fb.venuesCollection.doc(this.$route.params.id).update({
+          reviews: 0
+        });
+      }
     }
   },
 
