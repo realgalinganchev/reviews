@@ -76,10 +76,11 @@ export default {
     });
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "venues", "reviews"])
+    ...mapState(["userProfile", "currentUser", "venues"])
   },
   methods: {
     deleteReview(review) {
+      let updatedReviews = this.venue.reviews;
       fb.reviewsCollection
         .doc(review.id)
         .delete()
@@ -89,6 +90,28 @@ export default {
         .catch(function(error) {
           console.error("Error removing document: ", error);
         });
+      fb.reviewsCollection
+        .where("venueId", "==", this.$route.params.id)
+        .orderBy("createdOn", "desc")
+        .get()
+        .then(docs => {
+          let reviewsArray = [];
+
+          docs.forEach(doc => {
+            let review = doc.data();
+            review.id = doc.id;
+            reviewsArray.push(review);
+          });
+
+          this.venueReviews = reviewsArray;
+          this.fullVenue = this.venue;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+      fb.venuesCollection.doc(this.$route.params.id).update({
+                reviews:  updatedReviews - 1
+              });
     }
   },
 

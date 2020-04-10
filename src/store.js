@@ -13,30 +13,22 @@ fb.auth.onAuthStateChanged(user => {
         fb.usersCollection.doc(user.uid).onSnapshot(doc => {
             store.commit('setUserProfile', doc.data());
         })
-
-        // realtime updates from our venues collection
         fb.venuesCollection.orderBy('createdOn', 'desc').onSnapshot(querySnapshot => {
             let venuesArray = [];
-
             querySnapshot.forEach(doc => {
                 let venue = doc.data();
                 venue.id = doc.id;
                 venuesArray.push(venue);
             })
-
             store.commit('setVenues', venuesArray);
-
         });
-        // realtime updates from our reviews collection
         fb.reviewsCollection.orderBy('createdOn', 'desc').onSnapshot(querySnapshot => {
             let reviewsArray = [];
-
             querySnapshot.forEach(doc => {
                 let review = doc.data();
                 review.id = doc.id;
                 reviewsArray.push(review);
             })
-
             store.commit('setReviews', reviewsArray);
 
         })
@@ -49,55 +41,6 @@ export const store = new Vuex.Store({
         userProfile: {},
         venues: [],
         reviews: [],
-
-    },
-    actions: {
-        clearData({ commit }) {
-            commit('setCurrentUser', null);
-            commit('setUserProfile', {});
-            commit('setVenues', null);
-            commit('setReviews', null);
-
-        },
-        fetchUserProfile({ commit, state }) {
-            fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
-                commit('setUserProfile', res.data());
-            }).catch(err => {
-                console.log(err);
-            })
-        },
-        // eslint-disable-next-line no-unused-vars
-        updateProfile({ commit, state }, data) {
-            let name = data.name;
-            let surname = data.surname;
-            let phoneNumber = data.phoneNumber;
-
-            // eslint-disable-next-line no-unused-vars
-            fb.usersCollection.doc(state.currentUser.uid).update({ name, surname, phoneNumber }).then(user => {
-                // update all venues by user to reflect new name
-                fb.venuesCollection.where('userId', '==', state.currentUser.uid).get().then(docs => {
-                    docs.forEach(doc => {
-                        fb.venuesCollection.doc(doc.id).update({
-                            userName: name,
-                            surname: surname,
-                            phoneNumber: phoneNumber
-                        })
-                    })
-                })
-                // update all reviews by user to reflect new name
-                fb.reviewsCollection.where('userId', '==', state.currentUser.uid).get().then(docs => {
-                    docs.forEach(doc => {
-                        fb.reviewsCollection.doc(doc.id).update({
-                            userName: name,
-                            surname: surname,
-                            phoneNumber: phoneNumber
-                        })
-                    })
-                })
-            }).catch(err => {
-                console.log(err);
-            })
-        }
     },
     mutations: {
         setCurrentUser(state, val) {
@@ -120,5 +63,50 @@ export const store = new Vuex.Store({
                 state.reviews = [];
             }
         }
+    },
+    actions: {
+        clearData({ commit }) {
+            commit('setCurrentUser', null);
+            commit('setUserProfile', {});
+            commit('setVenues', null);
+            commit('setReviews', null);
+        },
+        fetchUserProfile({ commit, state }) {
+            fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
+                commit('setUserProfile', res.data());
+            }).catch(err => {
+                console.log(err);
+            })
+        },
+
+        updateProfile({ state }, data) {
+            let name = data.name;
+            let surname = data.surname;
+            let phoneNumber = data.phoneNumber;
+
+            fb.usersCollection.doc(state.currentUser.uid).update({ name, surname, phoneNumber }).then(() => {
+                fb.venuesCollection.where('userId', '==', state.currentUser.uid).get().then(docs => {
+                    docs.forEach(doc => {
+                        fb.venuesCollection.doc(doc.id).update({
+                            userName: name,
+                            surname: surname,
+                            phoneNumber: phoneNumber
+                        });
+                    });
+                });
+                fb.reviewsCollection.where('userId', '==', state.currentUser.uid).get().then(docs => {
+                    docs.forEach(doc => {
+                        fb.reviewsCollection.doc(doc.id).update({
+                            userName: name,
+                            surname: surname,
+                            phoneNumber: phoneNumber
+                        });
+                    });
+                });
+            }).catch(err => {
+                console.log(err);
+            });
+        }
     }
-})
+
+});
