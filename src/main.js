@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -7,13 +6,13 @@ const fb = require('./firebase.js')
 import './assets/scss/app.scss'
 
 
-Vue.config.productionTip = false
-Vue.use(router)
+Vue.config.productionTip = false;
+Vue.use(router);
 
 let app = '';
 
 
-fb.auth.onAuthStateChanged(user => {
+fb.auth.onAuthStateChanged(() => {
     if (!app) {
         app = new Vue({
             el: '#app',

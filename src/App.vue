@@ -9,10 +9,10 @@
 <script>
 import { mapState } from "vuex";
 import Header from "./shared/Header.vue";
-import Footer from "./shared/Footer"
+import Footer from "./shared/Footer";
 
 export default {
-  components: { Header , Footer},
+  components: { Header, Footer },
   computed: {
     ...mapState(["currentUser"])
   }

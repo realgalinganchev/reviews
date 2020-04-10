@@ -11,18 +11,18 @@ const config = {
     appId: "1:590282046635:web:8ba8444c9147c15a104bee",
     measurementId: "G-LKT96SY8CS"
 }
-firebase.initializeApp(config)
+firebase.initializeApp(config);
 
 
-const db = firebase.firestore()
-const auth = firebase.auth()
-const currentUser = auth.currentUser
+const db = firebase.firestore();
+const auth = firebase.auth();
+const currentUser = auth.currentUser;
 
 
-const usersCollection = db.collection('users')
-const venuesCollection = db.collection('venues')
-const reviewsCollection = db.collection('reviews')
-const likesCollection = db.collection('likes')
+const usersCollection = db.collection('users');
+const venuesCollection = db.collection('venues');
+const reviewsCollection = db.collection('reviews');
+const likesCollection = db.collection('likes');
 
 export {
     db,
