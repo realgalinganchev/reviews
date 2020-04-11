@@ -30,6 +30,7 @@
 <script>
 import { mapState } from "vuex";
 const fb = require("../firebase.js");
+// import { required, minLength } from 'vuelidate/lib/validators'
 
 export default {
   name: "AddVenue",
