@@ -1,6 +1,6 @@
 <template >
   <div>
-    <div class="title">
+    <div class="venue-title">
       <transition name="fade">
         <p v-if="showFailure" class="failure">You have not submitted this review!</p>
       </transition>

@@ -2,7 +2,7 @@
   <div id="venue-list">
     <section>
       <div class="col2">
-        <div class="title">
+        <div>
           <transition name="fade">
             <p v-if="showFailureVenue" class="failure">You have not created this venue!</p>
           </transition>

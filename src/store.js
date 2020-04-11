@@ -22,16 +22,6 @@ fb.auth.onAuthStateChanged(user => {
             })
             store.commit('setVenues', venuesArray);
         });
-        fb.reviewsCollection.orderBy('createdOn', 'desc').onSnapshot(querySnapshot => {
-            let reviewsArray = [];
-            querySnapshot.forEach(doc => {
-                let review = doc.data();
-                review.id = doc.id;
-                reviewsArray.push(review);
-            })
-            store.commit('setReviews', reviewsArray);
-
-        })
     }
 })
 
@@ -40,7 +30,6 @@ export const store = new Vuex.Store({
         currentUser: null,
         userProfile: {},
         venues: [],
-        reviews: [],
     },
     mutations: {
         setCurrentUser(state, val) {
@@ -56,20 +45,12 @@ export const store = new Vuex.Store({
                 state.venues = [];
             }
         },
-        setReviews(state, val) {
-            if (val) {
-                state.reviews = val;
-            } else {
-                state.reviews = [];
-            }
-        }
     },
     actions: {
         clearData({ commit }) {
             commit('setCurrentUser', null);
             commit('setUserProfile', {});
             commit('setVenues', null);
-            commit('setReviews', null);
         },
         fetchUserProfile({ commit, state }) {
             fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
@@ -88,15 +69,6 @@ export const store = new Vuex.Store({
                 fb.venuesCollection.where('userId', '==', state.currentUser.uid).get().then(docs => {
                     docs.forEach(doc => {
                         fb.venuesCollection.doc(doc.id).update({
-                            userName: name,
-                            surname: surname,
-                            phoneNumber: phoneNumber
-                        });
-                    });
-                });
-                fb.reviewsCollection.where('userId', '==', state.currentUser.uid).get().then(docs => {
-                    docs.forEach(doc => {
-                        fb.reviewsCollection.doc(doc.id).update({
                             userName: name,
                             surname: surname,
                             phoneNumber: phoneNumber

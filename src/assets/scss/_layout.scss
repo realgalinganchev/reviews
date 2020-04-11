@@ -116,7 +116,7 @@ header {
         div {
             h2 {
                 text-align: center;
-                padding-top: 45px;
+                // padding-top: 20px;
             }
         }
     }
@@ -357,7 +357,17 @@ header {
         margin-top: 2rem;
     }
 }
-.title{
-    text-align: center;
-    margin-top: 50px;
+
+.venue-title {
+    h2 {
+        margin-top: 50px;
+        text-align: center;
+    }
+    .failure {
+        color: $failure;
+         margin: 0.5rem 0 -2rem;
+         text-align: center;
+         margin-top: 70px;
+         
+    }
 }
