@@ -53,7 +53,7 @@
         <button @click="updateProfile" class="button">Update Profile</button>
         <p v-if="errors" class="error">
           The form above has errors,
-          <br />please get your act together and resubmit
+          <br />please get your act together and resubmit!
         </p>
         <p v-else-if="uiState === 'submit clicked'" class="error">
           The form above is empty,

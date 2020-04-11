@@ -45,7 +45,7 @@
           <input
             v-model.trim="signupForm.name"
             type="text"
-            placeholder="this field is required"
+            placeholder="required field"
             id="name"
             v-model.lazy="$v.signupForm.name.$model"
           />
@@ -58,7 +58,7 @@
           <input
             v-model.trim="signupForm.surname"
             type="text"
-            placeholder="this field is required"
+            placeholder="required field"
             id="surname"
             v-model.lazy="$v.signupForm.surname.$model"
           />
@@ -71,7 +71,7 @@
           <input
             v-model.trim="signupForm.phoneNumber"
             type="text"
-            placeholder="this field is required"
+            placeholder="required field"
             id="phone-number"
             v-model.lazy="$v.signupForm.phoneNumber.$model"
           />
